@@ -1,0 +1,11 @@
+*.pyc
+env/
+.pytest_cache/
+.driver_cache/
+.env
+.mongo_data/
+.coverage
+htmlcov/
+ext/
+.idea/
+*.egg-info*

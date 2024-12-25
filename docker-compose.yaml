@@ -1,0 +1,95 @@
+version: '3.8'
+
+x-environment:
+  &shared-envvar
+  OUTPUT_PATH: "/output"
+  CELERY_BROKER_URL: "redis://redis:6379/0"
+  CELERY_BACKEND_URL: "mongodb://root:example@mongo:27017/celery_backend"
+
+services:
+  web:
+    profiles:
+      - all
+      - e2e
+      - api
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./output:/output
+    environment:
+      << : *shared-envvar
+    healthcheck:
+      test: ["CMD-SHELL", "wget http://0.0.0.0:8000/ || exit 1"]
+      interval: 2s
+      timeout: 5s
+      retries: 3
+      start_period: 1s
+    depends_on:
+      - redis
+      - mongo
+
+  redis:
+    profiles:
+      - all
+      - e2e
+      - api
+    image: "redis:alpine"
+
+  mongo:
+    profiles:
+      - all
+      - e2e
+      - api
+    image: mongo:latest
+    volumes:
+      - ./.mongo_data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+
+  worker:
+    profiles:
+      - all
+      - e2e
+    build: .
+    command: celery -A celery_app worker --loglevel=info --concurrency=1 --prefetch-multiplier=1 -E
+    volumes:
+      - ./output/:/output/
+      - ./.driver_cache/:/root/.wdm/
+    environment:
+      << : *shared-envvar
+      C_FORCE_ROOT: true
+    depends_on:
+      - redis
+      - mongo
+
+  flower:
+    profiles:
+      - all
+      - e2e
+    build: .
+    command: /bin/sh /start_flower.sh
+    ports:
+      - "5555:5555"
+    environment:
+      << : *shared-envvar
+    volumes:
+      - ./start_flower.sh:/start_flower.sh
+    depends_on:
+      - redis
+      - worker
+      - mongo
+
+  e2e_tests:
+    profiles:
+      - e2e
+    image: badouralix/curl-jq
+    depends_on:
+      web:
+        condition: service_healthy
+    volumes:
+      - ./test.sh:/test.sh
+      - ./ext/:/ext/
+      - ./output/:/output/
+    entrypoint: ["/bin/sh", "/test.sh", "web", "8000", "./output"]

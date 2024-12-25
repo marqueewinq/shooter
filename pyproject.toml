@@ -1,0 +1,46 @@
+[project]
+name = "shooter"
+version = "0.1.0"
+description = "A Python project"
+authors = [
+    {name = "Your Name", email = "your_email@example.com"}
+]
+dependencies = [
+    "blinker<1.8.0",
+    "celery[pymongo]",
+    "fastapi",
+    "fire",
+    "flower",
+    "numpy",
+    "opencv-python",
+    "pymongo",
+    "python-multipart",
+    "redis",
+    "retry",
+    "selenium",
+    "selenium-wire",
+    "setuptools",
+    "uvicorn",
+    "webdriver_manager"
+]
+
+[project.optional-dependencies]
+test = [
+    "asgi-lifespan",
+    "httpx",
+    "pytest",
+    "pytest-asyncio",
+    "pytest-cov"
+]
+
+[tool.pytest.ini_options]
+addopts = "--cov"
+testpaths = ["tests"]
+
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["shooter"]
