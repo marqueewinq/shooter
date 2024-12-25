@@ -19,26 +19,26 @@ CLI documentation can be read here: `python -m shooter --help`.
 ### Architecture
 
 The User sends HTTP request to API server. API server sends task(-s) to Task Broker. Several Workers are subscribed to
-the Task Broker and pick up the tasks. Each Worker calls it's own `make_screenshot` function. The User can invoke 
+the Task Broker and pick up the tasks. Each Worker calls it's own `make_screenshot` function. The User can invoke
 `make_screenshot` function by themselves; the HTTP request schema matches the function signature:
 
 <img src="./docs/diagrams/arch.png"/>
 
 Each request contains one or more `TakeScreenshotConfig` objects ("configs"). Each config specifies one task, which will
 be picked up by worker, and one invocation of the `make_screenshot` function. The config specifies the target URL and
-several other parameters, including full page screenshot option, browser & device selection, whether to additionally 
+several other parameters, including full page screenshot option, browser & device selection, whether to additionally
 capture HTML elements on the page, waiting options, proxy settings etc.
 
 <img src="./docs/diagrams/request.png"/>
 
 Each task will be put to the broker's queue separately (so different workers will pick up the tasks independently). At
-the same time, all those tasks will form a _task group_. The task group is considered complete when all it's member 
-tasks are complete; task group is considered failed if at least one task failed (other tasks will still be run and 
+the same time, all those tasks will form a _task group_. The task group is considered complete when all it's member
+tasks are complete; task group is considered failed if at least one task failed (other tasks will still be run and
 partial results will still be available).
 
 <img src="./docs/diagrams/group_task.png"/>
 
-The result of each task is two groups of artifacts. Given `--output_path`, the function creates them in the given 
+The result of each task is two groups of artifacts. Given `--output_path`, the function creates them in the given
 folder. The actual results are: screenshot image, detected HTML elements (as JSON) and same screenshot
 image labelled with those elements. The debug artifacts are: initial config (as JSON) and log file (as TXT).
 
@@ -47,7 +47,7 @@ the labelled image may be absent.
 
 <img src="./docs/diagrams/output.png"/>
 
-The user can queue status of his HTTP request (which corresponds to the status of the task group): number of total 
+The user can queue status of his HTTP request (which corresponds to the status of the task group): number of total
 tasks, proceeded, failed and the overall status of the task group. When the task group is finished, user may request
 the zip file; each task artifacts will be in the separate folder.
 
@@ -172,6 +172,20 @@ python screenshot.py $URL $OUTPUT_DIR \
  - set up a virtualenv if needed: `virtualenv env --python=python3.12` and activate it
  - install pre-commit hooks: `pre-commit install`
    - if needed, install `pre-commit` first: `pip install pre-commit`
+
+### Webdriver versioning
+
+Google publishes their newer packages into Ubuntu Apt, while removing the old ones. If you get a build-time error with
+"Version '125.0.6422.*' for 'google-chrome-stable' was not found", try the following:
+
+```
+$ apt search google-chrome-stable
+google-chrome-stable/stable 131.0.6778.204-1 amd64 [upgradable from: 125.0.6422.112-1]
+  The web browser from Google
+```
+
+The newer `131.0.6778.204` version should be inserted into the Dockerfile in "Install Chrome and ChromeDriver" section.
+
 
 ### Run the service with `docker-compose`
 

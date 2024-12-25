@@ -3,11 +3,11 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+from shooter.__main__ import browser_to_screenshooter_class, make_screenshot_from_url
 from shooter.actions import ScrollDownAction, ScrollUpAction
 from shooter.draw import ElementItem
 from shooter.drivers import ChromeScreenshooter, FirefoxScreenshooter
 from shooter.schema import BrowserChoice
-from shooter.__main__ import browser_to_screenshooter_class, make_screenshot_from_url
 
 
 @pytest.mark.parametrize(

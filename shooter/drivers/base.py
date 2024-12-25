@@ -16,7 +16,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from seleniumwire.webdriver import Chrome, Firefox
 
-from shooter.actions import BaseAction, ScrollDownAction, ScrollToTopAction
+from shooter.actions import BaseAction, ScrollToTopAction
 from shooter.draw import ElementItem
 from shooter.drivers.device import Device, DeviceConfig
 

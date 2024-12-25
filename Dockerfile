@@ -34,8 +34,8 @@ RUN apt-get update && apt-get install -y \
 # Install Chrome and ChromeDriver
 RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
 RUN echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list
-RUN apt-get update && apt search google-chrome-stable && apt-get install -y "google-chrome-stable=130.0.6723.*" && rm -rf /var/lib/apt/lists/*
-RUN wget -N https://storage.googleapis.com/chrome-for-testing-public/130.0.6723.58/linux64/chromedriver-linux64.zip -P /tmp
+RUN apt-get update && apt search google-chrome-stable && apt-get install -y "google-chrome-stable=131.0.6778.*" && rm -rf /var/lib/apt/lists/*
+RUN wget -N https://storage.googleapis.com/chrome-for-testing-public/131.0.6778.204/linux64/chromedriver-linux64.zip -P /tmp
 RUN unzip /tmp/chromedriver-linux64.zip -d /tmp/chromedriver-extract
 RUN find /tmp/chromedriver-extract -type f -exec mv {} /usr/local/bin/ \;
 RUN chmod +x /usr/local/bin/chromedriver
@@ -49,9 +49,14 @@ RUN tar -xjf /tmp/firefox.tar.bz2 -C /opt/ \
     && ln -s /opt/firefox/firefox /usr/local/bin/firefox
 
 COPY ./pyproject.toml /work/pyproject.toml
-RUN pip install --no-cache-dir -e .
+
+COPY ./pyproject.toml ./pyproject.toml
+RUN awk '/dependencies = \[/{flag=1;next}/\]/{flag=0}flag' pyproject.toml | sed 's/[",]//g' > requirements.txt && \
+    awk '/web = \[/{flag=1;next}/\]/{flag=0}flag' pyproject.toml | sed 's/[",]//g' >> requirements.txt && \
+    pip install -r requirements.txt
 
 COPY shooter /work/shooter/
+RUN pip install --no-cache-dir -e .
 
 ENV CHROMEDRIVER_PATH=/usr/local/bin/chromedriver
 ENV GECKODRIVER_PATH=/usr/local/bin/geckodriver

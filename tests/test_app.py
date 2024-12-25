@@ -1,5 +1,3 @@
-import io
-import json
 import os
 import tempfile
 import zipfile
@@ -12,7 +10,6 @@ from fastapi.testclient import TestClient
 
 from shooter.app import app as fastapi_app
 from shooter.app import setup_app
-from shooter.schema import TakeScreenshotConfig
 
 
 @pytest.fixture
