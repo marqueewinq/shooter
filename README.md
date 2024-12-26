@@ -106,7 +106,7 @@ curl -s -XPOST "http://$HOST:$PORT/take_screenshots/" \
 Example (CLI):
 
 ```bash
-PYTHONPATH=./ python shooter/screenshot.py https://www.amazon.ae/ ./output/ \
+python -m shooter https://www.amazon.ae/ ./output/ \
   --device=IPHONE_X \
   --browser=chrome \
   --actions='[{"kind": "click_element", "element_query_selector": "#nav-hamburger-menu i"}]'
@@ -154,13 +154,13 @@ In CLI, `--proxy` parameter can also be passed in these three ways. Instead of `
 Example of the connection string of the proxy config above:
 
 ```bash
-python screenshot.py $URL $OUTPUT_DIR --proxy='https://proxyuser:imfirinmylaser@proxyserver.com:8989/'
+python -m shooter $URL $OUTPUT_DIR --proxy='https://proxyuser:imfirinmylaser@proxyserver.com:8989/'
 ```
 
 The list can also be passed:
 
 ```bash
-python screenshot.py $URL $OUTPUT_DIR \
+python -m shooter $URL $OUTPUT_DIR \
   --proxy='["https://proxyuser:imfirinmylaser@proxyserver.com:8989/",\
             "https://proxyuser:imfirinmylaser@alternativeserver.com:8989/"]'
 ```
